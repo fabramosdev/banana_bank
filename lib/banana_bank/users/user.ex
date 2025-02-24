@@ -27,7 +27,7 @@ defmodule BananaBank.Users.User do
   end
 
   defp add_password_hash(%Changeset{valid?: true, changes: %{password: password}} = changeset) do
-    change(changeset, Argon2.hash_pwd_salt(password, [:salt_len]))
+    change(changeset, Argon2.add_hash(password))
   end
 
   defp add_password_hash(changeset), do: changeset
