@@ -4,6 +4,7 @@ defmodule BananaBankWeb.ErrorJSON do
 
   See config/config.exs.
   """
+  alias Ecto.Changeset
 
   # If you want to customize a particular status code,
   # you may add your own clauses, such as:
@@ -17,5 +18,17 @@ defmodule BananaBankWeb.ErrorJSON do
   # "Not Found".
   def render(template, _assigns) do
     %{errors: %{detail: Phoenix.Controller.status_message_from_template(template)}}
+  end
+
+  def error(%{changeset: changeset}) do
+    %{
+      errors: Changeset.traverse_errors(changeset, &translate_errors/1)
+    }
+  end
+
+  defp translate_errors({msg, options}) do
+    Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
+      options |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
+    end)
   end
 end
